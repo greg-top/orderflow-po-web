@@ -1,12 +1,12 @@
 # OrderFlow Product Owner Web
 
-Public React client for student refinement sessions with the OrderFlow Product Owner. It provides session entry, a conversation view, question limits, session completion and server-generated transcript download.
+Publiczny klient React przeznaczony do studenckich sesji refinementu z Product Ownerem systemu OrderFlow. Aplikacja udostępnia formularz wejściowy, widok rozmowy, licznik pytań, zakończenie sesji oraz pobieranie transkryptu wygenerowanego przez serwer.
 
-This repository contains only UI code, public API contracts and frontend tests. It does not contain business Knowledge, agent prompts, private evals, source PDFs or secrets.
+Repozytorium zawiera wyłącznie kod interfejsu, publiczne kontrakty API i testy frontendu. Nie zawiera wiedzy biznesowej, promptów agenta, prywatnych ewaluacji, źródłowych plików PDF ani sekretów.
 
-## Development
+## Uruchomienie lokalne
 
-Use Node.js 24 and pnpm 11.19:
+Wymagane są Node.js 24 oraz pnpm 11.19:
 
 ```text
 pnpm install --frozen-lockfile
@@ -14,17 +14,19 @@ copy .env.example .env.local
 pnpm dev
 ```
 
-Set `VITE_API_BASE_URL` to the Worker origin. The access code is submitted directly to the Worker and is never written to localStorage, sessionStorage, IndexedDB or application logs. The session token is retained only in React memory.
+W zmiennej `VITE_API_BASE_URL` ustaw adres bazowy Workera. Kod dostępu jest przesyłany bezpośrednio do Workera i nigdy nie trafia do `localStorage`, `sessionStorage`, IndexedDB ani logów aplikacji.
 
-## Quality and build
+Token aktywnej sesji jest zapisywany wyłącznie w `sessionStorage`, aby po odświeżeniu tej samej karty można było automatycznie pobrać aktualny stan i historię z endpointu `GET /api/session`. Token znika po zamknięciu karty lub po odrzuceniu go przez serwer. Frontend nie zapisuje lokalnie historii rozmowy.
+
+## Kontrola jakości i budowanie
 
 ```text
 pnpm check
 pnpm test:coverage
 ```
 
-Vite uses the repository base path `/orderflow-po-web/`. Production builds disable source maps.
+Vite używa ścieżki bazowej repozytorium `/orderflow-po-web/`. Mapy źródłowe są wyłączone w buildzie produkcyjnym.
 
 ## GitHub Pages
 
-Set the repository variable `VITE_API_BASE_URL` to the production Worker URL and configure Pages to use GitHub Actions. The workflow installs from the lockfile, runs lint and tests, builds `dist`, uploads the Pages artifact and deploys it.
+Ustaw zmienną repozytorium `VITE_API_BASE_URL` na produkcyjny adres Workera, a następnie skonfiguruj Pages do publikacji przez GitHub Actions. Workflow instaluje zależności z pliku blokady, uruchamia lint i testy, buduje katalog `dist`, przesyła artefakt Pages i wykonuje wdrożenie.
