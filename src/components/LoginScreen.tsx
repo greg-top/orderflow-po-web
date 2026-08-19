@@ -146,7 +146,10 @@ export function LoginScreen({ error, loading, onStart }: LoginScreenProps) {
             {loading ? "Rozpoczynanie..." : "Rozpocznij refinement"}
           </button>
         </form>
-        <p className="entry-footer">Bezpieczna sesja · Limit 60 pytań · Wersja A</p>
+        <p className="entry-footer">
+          Bezpieczna sesja · Limit 60 pytań · Wersja A<br />
+          Aktywna sesja zostanie automatycznie przywrócona po odświeżeniu tej karty.
+        </p>
       </section>
     </main>
   );

@@ -8,7 +8,7 @@ interface RefinementScreenProps {
   error: string | null;
   busy: boolean;
   finished: boolean;
-  onSend: (message: string) => Promise<void>;
+  onSend: (message: string) => Promise<boolean>;
   onFinish: () => Promise<void>;
   onDownload: () => Promise<void>;
 }
@@ -46,8 +46,7 @@ export function RefinementScreen({
     event.preventDefault();
     const message = draft.trim();
     if (!message || busy || finished) return;
-    await onSend(message);
-    setDraft("");
+    if (await onSend(message)) setDraft("");
   };
 
   const finish = async () => {

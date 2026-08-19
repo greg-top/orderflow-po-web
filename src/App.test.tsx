@@ -34,11 +34,13 @@ describe("OrderFlow refinement UI", () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
+    window.sessionStorage.clear();
     vi.stubEnv("VITE_API_BASE_URL", "https://agent.example");
     vi.stubGlobal("fetch", fetchMock);
   });
 
   afterEach(() => {
+    window.sessionStorage.clear();
     cleanup();
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
@@ -85,6 +87,34 @@ describe("OrderFlow refinement UI", () => {
     expect(screen.getByText("Jan Kowalski")).toBeInTheDocument();
     expect(screen.getByText("Poprzednie pytanie")).toBeInTheDocument();
     expect(screen.getByText("Poprzednia odpowiedź")).toBeInTheDocument();
+    expect(window.sessionStorage.getItem("orderflow.sessionToken")).toBe("session-token");
+  });
+
+  it("restores an active session and history after a page refresh", async () => {
+    window.sessionStorage.setItem("orderflow.sessionToken", "stored-session-token");
+    fetchMock.mockResolvedValueOnce(
+      response({
+        student: { firstName: "Jan", lastName: "Kowalski", albumNumber: "12345" },
+        sessionId: sessionBody.sessionId,
+        variant: "A",
+        status: "ACTIVE",
+        maxQuestions: 60,
+        questionCount: 1,
+        history: [
+          { role: "STUDENT", content: "Pytanie sprzed odświeżenia", createdAt: "2026-08-19T12:00:00Z" },
+          { role: "PRODUCT_OWNER", content: "Zachowana odpowiedź", createdAt: "2026-08-19T12:00:01Z" },
+        ],
+      }),
+    );
+
+    render(<App />);
+
+    expect(await screen.findByText("Pytanie sprzed odświeżenia")).toBeInTheDocument();
+    expect(screen.getByText("Zachowana odpowiedź")).toBeInTheDocument();
+    expect(screen.getByText("1 / 60")).toBeInTheDocument();
+    const restoreCall = fetchMock.mock.calls[0];
+    expect(restoreCall?.[0]).toBe("https://agent.example/api/session");
+    expect(restoreCall?.[1]?.headers).toMatchObject({ Authorization: "Bearer stored-session-token" });
   });
 
   it("sends a question and renders the Product Owner response", async () => {
@@ -119,7 +149,31 @@ describe("OrderFlow refinement UI", () => {
     await user.type(screen.getByLabelText("Zadaj pytanie"), "Pytanie bez odpowiedzi");
     await user.click(screen.getByRole("button", { name: "Wyślij" }));
     expect(await screen.findByText("Product Owner jest chwilowo niedostępny.")).toBeInTheDocument();
-    expect(screen.queryByText("Pytanie bez odpowiedzi")).not.toBeInTheDocument();
+    expect(screen.queryByText("Pytanie bez odpowiedzi", { selector: ".message-body p" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Zadaj pytanie")).toHaveValue("Pytanie bez odpowiedzi");
+  });
+
+  it("keeps a stored token and offers retry when session restoration is temporarily unavailable", async () => {
+    window.sessionStorage.setItem("orderflow.sessionToken", "stored-session-token");
+    fetchMock
+      .mockResolvedValueOnce(
+        response({ error: { code: "SERVICE_UNAVAILABLE", message: "Usługa jest chwilowo niedostępna." } }, 503),
+      )
+      .mockResolvedValueOnce(
+        response({
+          student: { firstName: "Jan", lastName: "Kowalski", albumNumber: "12345" },
+          ...sessionBody,
+          status: "ACTIVE",
+        }),
+      );
+
+    render(<App />);
+
+    expect(await screen.findByText("Nie udało się przywrócić sesji")).toBeInTheDocument();
+    expect(window.sessionStorage.getItem("orderflow.sessionToken")).toBe("stored-session-token");
+    await userEvent.click(screen.getByRole("button", { name: "Spróbuj ponownie" }));
+    expect(await screen.findByText(sessionBody.sessionId)).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("finishes the session and downloads the server transcript", async () => {

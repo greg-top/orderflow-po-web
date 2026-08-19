@@ -3,6 +3,7 @@ import type {
   RefinementResponse,
   SessionRequest,
   SessionResponse,
+  SessionSnapshotResponse,
   TranscriptResponse,
 } from "./types";
 
@@ -58,6 +59,9 @@ const authorized = (token: string): HeadersInit => ({ Authorization: `Bearer ${t
 export const api = {
   startSession(input: SessionRequest): Promise<SessionResponse> {
     return request("/api/session", { method: "POST", body: JSON.stringify(input) });
+  },
+  session(token: string): Promise<SessionSnapshotResponse> {
+    return request("/api/session", { headers: authorized(token) });
   },
   refine(token: string, message: string): Promise<RefinementResponse> {
     return request("/api/refinement", {

@@ -23,6 +23,16 @@ export interface SessionResponse {
   history: ChatMessage[];
 }
 
+export interface SessionSnapshotResponse {
+  student: StudentIdentity;
+  sessionId: string;
+  variant: "A";
+  status: "ACTIVE" | "FINISHED";
+  maxQuestions: number;
+  questionCount: number;
+  history: ChatMessage[];
+}
+
 export interface RefinementResponse {
   message: string;
   questionCount: number;
