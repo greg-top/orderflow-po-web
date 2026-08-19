@@ -69,6 +69,23 @@ describe("OrderFlow refinement UI", () => {
     expect(screen.getByLabelText("Kod dostępu")).toHaveValue("");
   });
 
+  it("shows the two-session limit returned by the service", async () => {
+    fetchMock.mockResolvedValueOnce(
+      response({
+        error: {
+          code: "SESSION_ATTEMPT_LIMIT",
+          message: "Wykorzystano limit dwóch sesji dla tego numeru albumu i wersji.",
+        },
+      }, 409),
+    );
+    render(<App />);
+    const user = await completeLoginForm();
+    await user.click(screen.getByRole("button", { name: "Rozpocznij refinement" }));
+    expect(
+      await screen.findByText("Wykorzystano limit dwóch sesji dla tego numeru albumu i wersji."),
+    ).toBeInTheDocument();
+  });
+
   it("creates a session and renders the server-provided history", async () => {
     fetchMock.mockResolvedValueOnce(
       response({
@@ -208,5 +225,10 @@ describe("OrderFlow refinement UI", () => {
     await waitFor(() => expect(createObjectUrl).toHaveBeenCalledOnce());
     expect(click).toHaveBeenCalledOnce();
     expect(revokeObjectUrl).toHaveBeenCalledWith("blob:test");
+    expect(window.sessionStorage.getItem("orderflow.sessionToken")).toBe("session-token");
+
+    await user.click(screen.getByRole("button", { name: "Zamknij widok sesji" }));
+    expect(await screen.findByRole("button", { name: "Rozpocznij refinement" })).toBeInTheDocument();
+    expect(window.sessionStorage.getItem("orderflow.sessionToken")).toBeNull();
   });
 });

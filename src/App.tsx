@@ -118,6 +118,17 @@ export default function App() {
     setError(message);
   };
 
+  const closeSessionView = () => {
+    clearSessionToken();
+    setResumeToken(null);
+    setStudent(null);
+    setSession(null);
+    setMessages([]);
+    setFinished(false);
+    setRestoreError(null);
+    setError(null);
+  };
+
   const handleOperationError = (caught: unknown) => {
     if (
       caught instanceof ApiError &&
@@ -255,6 +266,7 @@ export default function App() {
       onSend={send}
       onFinish={finish}
       onDownload={download}
+      onClose={closeSessionView}
     />
   );
 }

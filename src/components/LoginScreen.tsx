@@ -147,7 +147,7 @@ export function LoginScreen({ error, loading, onStart }: LoginScreenProps) {
           </button>
         </form>
         <p className="entry-footer">
-          Bezpieczna sesja · Limit 60 pytań · Wersja A<br />
+          Bezpieczna sesja · Limit 60 pytań · Maksymalnie 2 sesje na numer albumu · Wersja A<br />
           Aktywna sesja zostanie automatycznie przywrócona po odświeżeniu tej karty.
         </p>
       </section>

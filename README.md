@@ -18,6 +18,8 @@ W zmiennej `VITE_API_BASE_URL` ustaw adres bazowy Workera. Kod dostępu jest prz
 
 Token aktywnej sesji jest zapisywany wyłącznie w `sessionStorage`, aby po odświeżeniu tej samej karty można było automatycznie pobrać aktualny stan i historię z endpointu `GET /api/session`. Token znika po zamknięciu karty lub po odrzuceniu go przez serwer. Frontend nie zapisuje lokalnie historii rozmowy.
 
+Jeden numer albumu może rozpocząć najwyżej dwie sesje w wersji A. Ponowne zalogowanie do nadal aktywnej sesji wznawia ją i nie zużywa drugiej próby. Po zakończeniu student może pobrać transkrypt oraz użyć przycisku „Zamknij widok sesji”, który usuwa token z bieżącej karty i wraca do formularza logowania. Nie usuwa to danych sesji z serwera.
+
 ## Kontrola jakości i budowanie
 
 ```text

@@ -11,6 +11,7 @@ interface RefinementScreenProps {
   onSend: (message: string) => Promise<boolean>;
   onFinish: () => Promise<void>;
   onDownload: () => Promise<void>;
+  onClose: () => void;
 }
 
 const initialMessage: ChatMessage = {
@@ -30,6 +31,7 @@ export function RefinementScreen({
   onSend,
   onFinish,
   onDownload,
+  onClose,
 }: RefinementScreenProps) {
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
@@ -127,9 +129,14 @@ export function RefinementScreen({
                 <strong>Refinement został zakończony</strong>
                 <p>Sesja jest tylko do odczytu. Pobierz transkrypt wygenerowany przez serwer.</p>
               </div>
-              <button className="primary-button compact" type="button" onClick={() => void onDownload()} disabled={busy}>
-                Pobierz transkrypt
-              </button>
+              <div className="finished-buttons">
+                <button className="primary-button compact" type="button" onClick={() => void onDownload()} disabled={busy}>
+                  Pobierz transkrypt
+                </button>
+                <button className="secondary-button compact" type="button" onClick={onClose} disabled={busy}>
+                  Zamknij widok sesji
+                </button>
+              </div>
             </div>
           ) : (
             <form className="composer" onSubmit={(event) => void submit(event)}>
