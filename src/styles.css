@@ -90,6 +90,44 @@ h1, h2, p { margin-top: 0; }
 .privacy-note p { margin-bottom: 0; color: #4d625f; font-size: 0.84rem; line-height: 1.55; }
 .privacy-icon { width: 23px; height: 23px; display: grid; place-items: center; flex: 0 0 23px; border-radius: 50%; color: white; background: var(--teal); font-weight: 700; font-family: serif; }
 
+.session-limit-note {
+  margin: 0 38px 22px;
+  padding: 18px 20px;
+  display: flex;
+  gap: 15px;
+  border: 1px solid #b9cbd9;
+  border-left: 4px solid var(--navy);
+  border-radius: 11px;
+  background: #f3f7fa;
+}
+.session-limit-badge {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--navy);
+  border-radius: 50%;
+  color: var(--navy);
+  background: white;
+  font-weight: 800;
+}
+.session-limit-note h2 { margin-bottom: 7px; color: var(--navy-deep); font-size: 1rem; }
+.session-limit-note p { margin-bottom: 8px; color: #465a6c; font-size: 0.82rem; line-height: 1.52; }
+.session-limit-note p:last-child { margin-bottom: 0; }
+.session-limit-summary { color: #25394b !important; }
+.session-limit-summary strong {
+  display: inline-block;
+  padding: 2px 5px;
+  border: 1px solid #839daf;
+  border-radius: 4px;
+  background: white;
+  color: #102b40;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.session-resume-copy { font-weight: 650; }
+
 .entry-form { padding: 4px 38px 30px; }
 .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .field { display: block; margin-bottom: 17px; }
@@ -216,6 +254,8 @@ h1, h2, p { margin-top: 0; }
   .entry-panel { min-height: 100vh; border: 0; border-radius: 0; }
   .brand-header { padding: 25px 22px; }
   .privacy-note { margin: 20px 22px 17px; }
+  .session-limit-note { margin: 0 22px 19px; padding: 16px; }
+  .session-limit-badge { width: 31px; height: 31px; flex-basis: 31px; }
   .entry-form { padding: 3px 22px 26px; }
   .field-grid { grid-template-columns: 1fr; gap: 0; }
   .workspace-header { align-items: flex-start; }

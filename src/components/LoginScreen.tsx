@@ -84,6 +84,25 @@ export function LoginScreen({ error, loading, onStart }: LoginScreenProps) {
           </div>
         </div>
 
+        <section className="session-limit-note" aria-labelledby="session-limit-title">
+          <div className="session-limit-badge" aria-hidden="true">2</div>
+          <div>
+            <h2 id="session-limit-title">Ważne przed rozpoczęciem</h2>
+            <p className="session-limit-summary">
+              Bezpieczna sesja · Limit 60 pytań ·{" "}
+              <strong>Maksymalnie 2 sesje na numer albumu</strong>{" "}
+              · Wersja A
+            </p>
+            <p>
+              Rozpoczęcie nowej sesji wykorzystuje jedno z dwóch dostępnych podejść. Odświeżenie
+              strony przywraca aktywną sesję i nie tworzy kolejnej.
+            </p>
+            <p className="session-resume-copy">
+              Aktywna sesja zostanie automatycznie przywrócona po odświeżeniu tej karty.
+            </p>
+          </div>
+        </section>
+
         <form className="entry-form" onSubmit={(event) => void handleSubmit(event)} noValidate>
           <div className="field-grid">
             <label className="field">
@@ -146,10 +165,6 @@ export function LoginScreen({ error, loading, onStart }: LoginScreenProps) {
             {loading ? "Rozpoczynanie..." : "Rozpocznij refinement"}
           </button>
         </form>
-        <p className="entry-footer">
-          Bezpieczna sesja · Limit 60 pytań · Maksymalnie 2 sesje na numer albumu · Wersja A<br />
-          Aktywna sesja zostanie automatycznie przywrócona po odświeżeniu tej karty.
-        </p>
       </section>
     </main>
   );
