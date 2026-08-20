@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
@@ -56,6 +56,25 @@ describe("OrderFlow refinement UI", () => {
     expect(screen.getByText("Podaj kod dostępu.")).toBeInTheDocument();
     expect(screen.getByText(/Potwierdź zapoznanie/)).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("prominently explains the non-renewable two-session limit before start", () => {
+    render(<App />);
+    const panel = screen.getByRole("region", { name: "Ważne przed rozpoczęciem" });
+    expect(panel).toHaveTextContent("Bezpieczna sesja");
+    expect(panel).toHaveTextContent("Limit 60 pytań");
+    expect(within(panel).getByText("Maksymalnie 2 sesje na numer albumu").tagName).toBe("STRONG");
+    expect(panel).toHaveTextContent(
+      "Rozpoczęcie nowej sesji wykorzystuje jedno z dwóch dostępnych podejść.",
+    );
+    expect(panel).toHaveTextContent(
+      "Odświeżenie strony przywraca aktywną sesję i nie tworzy kolejnej.",
+    );
+    expect(panel).toHaveTextContent(
+      "Aktywna sesja zostanie automatycznie przywrócona po odświeżeniu tej karty.",
+    );
+    const start = screen.getByRole("button", { name: "Rozpocznij refinement" });
+    expect(panel.compareDocumentPosition(start) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("shows a controlled login error and clears the access code field", async () => {
@@ -168,6 +187,27 @@ describe("OrderFlow refinement UI", () => {
     expect(await screen.findByText("Product Owner jest chwilowo niedostępny.")).toBeInTheDocument();
     expect(screen.queryByText("Pytanie bez odpowiedzi", { selector: ".message-body p" })).not.toBeInTheDocument();
     expect(screen.getByLabelText("Zadaj pytanie")).toHaveValue("Pytanie bez odpowiedzi");
+  });
+
+  it("shows the controlled rephrase guidance without consuming or rendering the question", async () => {
+    const message =
+      "Nie udało mi się przygotować bezpiecznej odpowiedzi na to pytanie. Spróbuj zadać je inaczej lub doprecyzować, o jaki etap anulowania chodzi. Pytanie nie zostało zapisane.";
+    fetchMock
+      .mockResolvedValueOnce(response(sessionBody, 201))
+      .mockResolvedValueOnce(
+        response({ error: { code: "RESPONSE_REPHRASE_REQUIRED", message } }, 422),
+      );
+    render(<App />);
+    const user = await completeLoginForm();
+    await user.click(screen.getByRole("button", { name: "Rozpocznij refinement" }));
+    await screen.findByText("REF-A-20260819-TEST");
+    await user.type(screen.getByLabelText("Zadaj pytanie"), "Niejasne pytanie");
+    await user.click(screen.getByRole("button", { name: "Wyślij" }));
+
+    expect(await screen.findByText(message)).toBeInTheDocument();
+    expect(screen.queryByText("Niejasne pytanie", { selector: ".message-body p" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Zadaj pytanie")).toHaveValue("Niejasne pytanie");
+    expect(screen.getByText("0 / 60")).toBeInTheDocument();
   });
 
   it("keeps a stored token and offers retry when session restoration is temporarily unavailable", async () => {
